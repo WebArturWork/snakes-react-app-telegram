@@ -18,7 +18,6 @@ const App = () => {
     const [food, setFood] = useState(getRandomPosition());
     const [gameOver, setGameOver] = useState(false);
     const [gameStarted, setGameStarted] = useState(false); // Флаг для начала игры
-    const gameBoardRef = useRef(null);
 
     // Обработчик нажатия клавиш для изменения направления змейки
     useEffect(() => {
@@ -45,52 +44,6 @@ const App = () => {
 
         return () => {
             window.removeEventListener('keydown', handleKeyPress);
-        };
-    }, []);
-
-    // Логика обработки свайпов
-    useEffect(() => {
-        const handleSwipe = (event) => {
-            const touch = event.changedTouches[0];
-            const startX = touch.clientX;
-            const startY = touch.clientY;
-
-            const handleMove = (event) => {
-                const touchMove = event.changedTouches[0];
-                const endX = touchMove.clientX;
-                const endY = touchMove.clientY;
-
-                const diffX = endX - startX;
-                const diffY = endY - startY;
-
-                if (Math.abs(diffX) > Math.abs(diffY)) {
-                    if (diffX > 0) {
-                        setDirection((prev) => (prev.x === -1 ? prev : { x: 1, y: 0 }));
-                    } else {
-                        setDirection((prev) => (prev.x === 1 ? prev : { x: -1, y: 0 }));
-                    }
-                } else {
-                    if (diffY > 0) {
-                        setDirection((prev) => (prev.y === -1 ? prev : { x: 0, y: 1 }));
-                    } else {
-                        setDirection((prev) => (prev.y === 1 ? prev : { x: 0, y: -1 }));
-                    }
-                }
-
-                window.removeEventListener('touchmove', handleMove);
-            };
-
-            window.addEventListener('touchmove', handleMove);
-
-            window.addEventListener('touchend', () => {
-                window.removeEventListener('touchmove', handleMove);
-            });
-        };
-
-        window.addEventListener('touchstart', handleSwipe);
-
-        return () => {
-            window.removeEventListener('touchstart', handleSwipe);
         };
     }, []);
 
@@ -150,7 +103,7 @@ const App = () => {
                     <button onClick={startNewGame}>Start Game</button>
                 </div>
             )}
-            <div className="game-board" ref={gameBoardRef}>
+            <div className="game-board">
                 {gameOver && <div className="game-over">Game Over</div>}
                 {Array.from({ length: boardSize }).map((_, row) => (
                     <div key={row} className="row">
@@ -168,6 +121,14 @@ const App = () => {
                         ))}
                     </div>
                 ))}
+            </div>
+            <div className="controls">
+                <button onClick={() => setDirection((prev) => (prev.y === 1 ? prev : { x: 0, y: -1 }))}>▲</button>
+                <div>
+                    <button onClick={() => setDirection((prev) => (prev.x === 1 ? prev : { x: -1, y: 0 }))}>◀</button>
+                    <button onClick={() => setDirection((prev) => (prev.x === -1 ? prev : { x: 1, y: 0 }))}>▶</button>
+                </div>
+                <button onClick={() => setDirection((prev) => (prev.y === -1 ? prev : { x: 0, y: 1 }))}>▼</button>
             </div>
             {gameOver && (
                 <div className="menu">
